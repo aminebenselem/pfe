@@ -14,8 +14,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -35,11 +40,21 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults()) // <-- VERY IMPORTANT
+
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/login","/signup").permitAll()
-                        .requestMatchers("/**").permitAll()
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/qcm/**").hasAnyRole("ADMIN","USER")
+                        .requestMatchers("/getCourses","getCourse/**").hasAnyRole("ADMIN","USER")
+                        .requestMatchers(HttpMethod.GET,"/history","dashboard").hasRole("HR")
+                        .requestMatchers(HttpMethod.POST,"/quiz/submit/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET,"/myhistory").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET,"/all","/signup").hasRole("ADMIN")
+                        .requestMatchers("/addcourse","/upload").hasRole("ADMIN")
+
                         .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
                         .requestMatchers(HttpMethod.PUT,"/**").permitAll()
+                        .requestMatchers("/categories","/api/files/download/**").permitAll()
 
 
                 )
@@ -69,6 +84,19 @@ public class SecurityConfig {
                         .allowCredentials(true);
             }
         };
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:4200")); // your Angular frontend URL
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
 }

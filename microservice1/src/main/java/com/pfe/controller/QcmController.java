@@ -34,7 +34,6 @@ public class QcmController {
     @Autowired
     private UserRepository userRepository;
 
-
     @PostMapping("/qcm")
     public ResponseEntity<String> createQcm(@RequestBody Qcm qcmDTO) {
         Qcm qcm = new Qcm();
