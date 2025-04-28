@@ -1,8 +1,6 @@
 package com.pfe.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,12 +9,19 @@ import java.util.List;
 
 public class Role {
 
-    public Long getRoleID() {
-        return roleID;
+
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long roleID;
+    private String name;
+
+    public List<User> getUsers() {
+        return users;
     }
 
-    public void setRoleID(Long roleID) {
-        this.roleID = roleID;
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 
     public String getName() {
@@ -27,18 +32,14 @@ public class Role {
         this.name = name;
     }
 
-    public List<User> getUsers() {
-        return users;
+    public Long getRoleID() {
+        return roleID;
     }
 
-    public void setUsers(List<User> users) {
-        this.users = users;
+    public void setRoleID(Long roleID) {
+        this.roleID = roleID;
     }
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long roleID;
-    private String name;
     @JsonIgnore
     @OneToMany(mappedBy = "role")
     private List<User> users = new ArrayList<>();

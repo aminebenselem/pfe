@@ -3,6 +3,7 @@ package com.pfe.controller;
 
 import com.pfe.Exceptions.InvalidCredentialsException;
 import com.pfe.config.TokenGeneration;
+import com.pfe.dto.Userdto;
 import com.pfe.entity.User;
 import com.pfe.repository.RoleRepository;
 import com.pfe.repository.UserRepository;
@@ -87,7 +88,7 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<Map<String, Object>> signup(@RequestBody User newUser) throws Exception {
+    public ResponseEntity<Map<String, Object>> signup(@RequestBody Userdto newUser) throws Exception {
         // Validate email format
 
         if (userService.getUserByUsernameOrEmail(newUser.getUsername(), newUser.getEmail()).isPresent()) {
@@ -97,7 +98,7 @@ public class UserController {
         User user = new User();
 
         user.setUsername(newUser.getUsername());
-        user.setRole(roleRepository.findById(2L).get());
+        user.setRole(roleRepository.getById(newUser.getRole()));
         user.setEmail(newUser.getEmail());
 
         user.setPassword(pe.encode(newUser.getPassword()));
@@ -110,4 +111,12 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);    }
 
 
+@GetMapping("/all")
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+}
+@DeleteMapping("/user/{id}")
+    public void deleteUser(@PathVariable Long id){
+        userRepository.deleteById(id);
+}
 }

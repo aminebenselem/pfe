@@ -1,8 +1,8 @@
 package com.pfe.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,36 +15,54 @@ import java.util.List;
 
 @Table(name = "users")
 public class User implements UserDetails {
+
+
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getUri() {
         return uri;
-    }
-
-    public void setUri(String uri) {
-        this.uri = uri;
     }
 
     public Role getRole() {
         return role;
     }
 
+    public List<History> getHistories() {
+        return histories;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public void setHistories(List<History> histories) {
+        this.histories = histories;
     }
 
     @Id
@@ -53,19 +71,16 @@ public class User implements UserDetails {
     private String username;
     private String email;
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
 
     private String password;
     private String uri;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "roleID")
     private Role role;
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<History> histories = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
